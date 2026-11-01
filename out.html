@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>We're out · Eaglewood, Sunriver</title>
+  <meta name="theme-color" content="#1f3d2b">
+  <meta name="robots" content="noindex">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="page">
+  <div class="mini-hero" style="background-image:url(photos/thumbs/exterior/01-front.jpg)">
+    <div class="wrap"><a class="home" href="./">← Eaglewood, Sunriver</a></div>
+  </div>
+  <main class="wrap">
+    <div class="card page-card" id="box">
+      <h1>Heading out?</h1>
+      <p class="sub">Thanks for staying at Eaglewood! Before you go:</p>
+      <ul class="checklist">
+        <li>Run the dishwasher and take out the trash</li>
+        <li>Turn off lights, close windows, and cover the hot tub</li>
+        <li>Lock all doors and close the garage</li>
+      </ul>
+      <button class="btn btn-pine out-btn" id="outBtn" type="button">We're out ✓</button>
+      <div class="form-msg" id="msg" role="alert"></div>
+    </div>
+  </main>
+  <script src="config.js"></script>
+  <script src="common.js"></script>
+  <script>
+  (function () {
+    var EW = window.EW, CFG = EW.cfg, box = document.getElementById('box'), btn = document.getElementById('outBtn'), msg = document.getElementById('msg');
+    var b = EW.qs('b'), t = EW.qs('t');
+    var sms = '<a href="sms:' + CFG.PHONE_SMS + '">' + CFG.PHONE_DISPLAY + '</a>';
+    function done(name, demo) {
+      box.innerHTML = '<div class="big-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"/></svg></div>' +
+        '<h1>Thanks' + (name ? ', ' + EW.esc(name) : '') + '! Safe travels.</h1>' +
+        '<p class="sub">' + (demo ? 'Preview only: in the live site this lets Dan know the house is ready for cleaning.' : 'Dan has been notified that Eaglewood is ready for cleaning.') + '</p>' +
+        '<p>Left something behind? Text Dan at ' + sms + '.</p><a class="btn btn-outline" href="./">Back to Eaglewood</a>';
+    }
+    if (!EW.demo && (!b || !t)) {
+      btn.disabled = true;
+      msg.className = 'form-msg show err';
+      msg.innerHTML = 'This link is incomplete. Please use the button in your checkout email, or text Dan at ' + sms + '.';
+    }
+    btn.addEventListener('click', function () {
+      if (EW.demo) return done('', true);
+      btn.disabled = true; btn.textContent = 'Sending…';
+      EW.api('out', { b: b, t: t }).then(function (j) { done(j.firstName); })
+        .catch(function (e) {
+          btn.disabled = false; btn.textContent = "We're out ✓";
+          msg.className = 'form-msg show err';
+          msg.innerHTML = EW.esc(e.message) + ' You can also just text Dan at ' + sms + '.';
+        });
+    });
+  })();
+  </script>
+</body>
+</html>

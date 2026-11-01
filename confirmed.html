@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Booking confirmed · Eaglewood, Sunriver</title>
+  <meta name="theme-color" content="#1f3d2b">
+  <meta name="robots" content="noindex">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="page">
+  <div class="mini-hero" style="background-image:url(photos/thumbs/exterior/03-back-deck.jpg)">
+    <div class="wrap"><a class="home" href="./">← Eaglewood, Sunriver</a></div>
+  </div>
+  <main class="wrap">
+    <div class="card page-card" id="box">
+      <div class="spinner" aria-hidden="true"></div>
+      <h1>Confirming your booking…</h1>
+      <p class="sub">Checking your payment with Stripe. This takes a few seconds.</p>
+    </div>
+  </main>
+  <script src="config.js"></script>
+  <script src="common.js"></script>
+  <script>
+  (function () {
+    var EW = window.EW, CFG = EW.cfg, box = document.getElementById('box');
+    var ok = '<div class="big-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"/></svg></div>';
+    var warn = '<div class="big-icon warn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 7v6M12 17h.01"/><circle cx="12" cy="12" r="10"/></svg></div>';
+    var sms = '<a href="sms:' + CFG.PHONE_SMS + '">' + CFG.PHONE_DISPLAY + '</a>';
+    function success(b, demo) {
+      var n = b.nights;
+      box.innerHTML = ok + '<h1>' + (demo ? 'Preview: you\'re booked!' : 'You\'re booked, ' + EW.esc(b.firstName) + '!') + '</h1>' +
+        '<p class="sub">' + (demo ? 'This is what guests see after paying. Payments aren\'t connected yet, so nothing was charged.' : 'Payment received. A confirmation email is on its way to <strong>' + EW.esc(b.email) + '</strong>.') + '</p>' +
+        '<div class="kv">' +
+        '<div><span>Check-in</span><span>' + EW.fmt(b.checkin, { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' }) + '</span></div>' +
+        '<div><span>Check-out</span><span>' + EW.fmt(b.checkout, { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' }) + '</span></div>' +
+        '<div><span>Nights</span><span>' + n + '</span></div>' +
+        '<div><span>Total paid</span><span>' + EW.money(b.total) + '</span></div>' +
+        (b.id ? '<div><span>Booking #</span><span>' + EW.esc(b.id) + '</span></div>' : '') +
+        '<div><span>Address</span><span>57922 Silver Fir Circle, Unit 26<br>Sunriver, OR 97707</span></div>' +
+        '</div>' +
+        '<p>Check-in details will come by text before you arrive. Questions? Text Dan at ' + sms + '.</p>' +
+        '<a class="btn btn-pine" href="./">Back to Eaglewood</a>';
+      try { sessionStorage.removeItem('ew_pending'); } catch (_) {}
+    }
+    function fail(msg) {
+      box.innerHTML = warn + '<h1>We couldn\'t confirm that yet</h1><p class="sub">' + EW.esc(msg) + '</p>' +
+        '<p>If you were charged, don\'t worry. Your payment is safe and Dan will sort it out. Text him at ' + sms + '.</p>' +
+        '<button class="btn btn-pine" type="button" onclick="location.reload()">Try again</button> <a class="btn btn-outline" href="./">Back to Eaglewood</a>';
+    }
+    var sid = EW.qs('booked');
+    if (EW.demo) {
+      var ci = EW.addDays(EW.today(), 30);
+      return success({ firstName: 'Sample', email: 'sample@example.com', checkin: ci, checkout: EW.addDays(ci, 3), nights: 3, total: CFG.CLEANING_FEE + 3 * CFG.UTILITIES_PER_NIGHT, id: 'DEMO' }, true);
+    }
+    if (!sid || !/^cs_(test|live)_[A-Za-z0-9]+$/.test(sid)) return fail('This link is missing its booking reference.');
+    var tries = 0;
+    (function attempt() {
+      EW.api('confirm', { session_id: sid }).then(function (j) { success(j.booking); })
+        .catch(function (e) {
+          // Stripe can take a moment to mark the payment paid; retry a few times.
+          if (++tries < 4 && /not paid|pending|network/i.test(e.message)) return setTimeout(attempt, 2500);
+          fail(e.message);
+        });
+    })();
+  })();
+  </script>
+</body>
+</html>
