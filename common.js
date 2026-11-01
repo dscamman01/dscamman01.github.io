@@ -28,7 +28,7 @@
     if (EW.demo) return Promise.reject(new Error('DEMO'));
     return fetch(CFG.BACKEND_URL + '?action=' + encodeURIComponent(action), { redirect: 'follow' })
       .then(function (r) { if (!r.ok) throw new Error('Network error'); return r.json(); })
-      .then(function (j) { if (!j || j.ok === false) throw new Error((j && j.error) || 'Error'); return j; });
+      .then(function (j) { if (!j || j.ok === false) throw new Error((j && j.error) || 'Something went wrong'); return j; });
   };
 
   /* ---------- dates: always plain local YYYY-MM-DD strings ---------- */
