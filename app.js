@@ -207,11 +207,13 @@
 
   function loadBookings() {
     if (EW.demo) { state.bookings = demoBookings(); renderCalendar(); renderStays(); return Promise.resolve(); }
+    var failed = false;
     return EW.apiGet('bookings').then(function (j) {
       state.bookings = (j.bookings || []).filter(function (b) { return b.checkin && b.checkout; });
     }).catch(function () {
+      failed = true;
       $('staysList').innerHTML = '<li class="none">Couldn\'t load bookings right now. Refresh to try again, or text Dan.</li>';
-    }).then(function () { renderCalendar(); if (state.bookings.length || !$('staysList').querySelector('.none')) renderStays(); });
+    }).then(function () { renderCalendar(); if (!failed) renderStays(); });
   }
 
   /* ================= price ================= */

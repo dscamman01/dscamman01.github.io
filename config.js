@@ -6,7 +6,7 @@
  * the pay button explains that payments are not connected yet.
  */
 window.EAGLEWOOD_CONFIG = {
-  BACKEND_URL: '',
+  BACKEND_URL: 'https://script.google.com/macros/s/AKfycbyO92a68sAHIGmcF9hCeheR82cOo6EgYMDDRNXWp4T3Hyf-FsbMcPHsJ10SZfkriBgB/exec',
 
   // Display prices only. The backend recomputes the real price server-side.
   CLEANING_FEE: 350,
