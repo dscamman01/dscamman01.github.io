@@ -384,7 +384,7 @@ function sendGuestConfirmation_(r) {
     tr_('Utilities', '$' + CONFIG.UTILITIES_PER_NIGHT + ' × ' + r.nights + ' = $' + (CONFIG.UTILITIES_PER_NIGHT * r.nights)) +
     tr_('Total paid', '<strong>$' + r.total + '</strong>') +
     tr_('Booking #', esc_(r.id)) +
-    tr_('Address', esc_(CONFIG.ADDRESS)) +
+    tr_('Address', '<a href="https://maps.apple.com/?address=57922%20Silver%20Fir%20Circle%2C%20Unit%2026%2C%20Sunriver%2C%20OR%2097707&amp;q=26%20Eaglewood" target="_blank" rel="noopener">' + esc_(CONFIG.ADDRESS) + '</a>') +
     '</table>' +
     '<h3 style="color:#1f3d2b;margin:20px 0 6px">Check-in info</h3><p>' + esc_(CONFIG.CHECK_IN_INFO) + '</p>' +
     '<p>On checkout morning you\'ll get an email with a "We\'re out" button. Please tap it when you leave.</p>' +
