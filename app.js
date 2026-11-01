@@ -157,7 +157,7 @@
           return;
         }
         if (b) { info('That overlaps ' + b.name + "'s stay (" + rangeLabel(b) + '). Your latest check-out is ' + EW.fmt(limit) + '.', true); return; }
-        info('Those dates overlap another stay, so we started a new check-in on ' + EW.fmt(ds) + '.', true);
+        info('Those dates overlap another stay, so we moved your check-in to ' + EW.fmt(ds) + '.', true);
         state.checkin = ds;
       }
     }
@@ -374,8 +374,8 @@
         else if (nT) { badge.textContent = 'Forecast + typical'; badge.className = 'wx-label ty'; }
         else { badge.textContent = 'Forecast'; badge.className = 'wx-label fc'; }
         var notes = [];
-        if (nF) notes.push('Forecast: daily high / low (°F) and precipitation from Open-Meteo.');
-        if (nT) notes.push('Dashed "Typical" days are past the 16-day forecast: averages for those calendar days over the last ' + (typicalCache[days[days.length - 1]] || {}).years + ' years, not a forecast.');
+        if (nF) notes.push('Forecast: daily high and low (°F), plus precipitation, from Open-Meteo.');
+        if (nT) notes.push('Dashed "Typical" days are past the 16-day forecast. They show the average for those dates over the last ' + (typicalCache[days[days.length - 1]] || {}).years + ' years, not a prediction.');
         if (selected && EW.nights(state.checkin, state.checkout) > 20) notes.push('Showing the first 3 weeks of your stay.');
         $('wxNote').textContent = notes.join(' ');
       });
@@ -423,7 +423,7 @@
       expectedTotal: price(n).total
     };
     if (EW.demo) {
-      formMsg('<strong>Payments not connected yet.</strong> This is a preview of the site. Your ' + n + '-night stay would be <strong>' + EW.money(price(n).total) + '</strong>. To book for real right now, text Dan at <a href="sms:' + CFG.PHONE_SMS + '">' + CFG.PHONE_DISPLAY + '</a>.', 'info');
+      formMsg('<strong>Payments aren\'t connected yet.</strong> This is a preview. Your ' + n + '-night stay would be <strong>' + EW.money(price(n).total) + '</strong>. To book now, text Dan at <a href="sms:' + CFG.PHONE_SMS + '">' + CFG.PHONE_DISPLAY + '</a>.', 'info');
       return;
     }
     var btn = $('payBtn'); btn.disabled = true;
@@ -443,7 +443,7 @@
   if (canceled) {
     var cb = $('cancelBanner');
     cb.hidden = false;
-    cb.textContent = 'Checkout was canceled and you were not charged. Your dates have been released, so you can try again below.';
+    cb.textContent = 'Checkout was canceled, and you weren\'t charged. Those dates are open again, so you can try below.';
     if (!EW.demo) EW.api('release', { b: canceled, t: EW.qs('t') || '' }).catch(function () {}).then(loadBookings);
     history.replaceState(null, '', location.pathname + '#book');
   }
@@ -469,6 +469,15 @@
   function altFrom(file) {
     var words = file.replace(/^\d+-/, '').split('-').map(function (w) { return w === 'ev' ? 'EV charger' : w === 'tv' ? 'TV' : w; });
     var s = words.join(' ');
+    var nicer = {
+      'front summer': 'Front of the house in summer',
+      'back yard and deck': 'Backyard and deck',
+      'primary bath double vanity': 'Primary bath with a double vanity',
+      'bath tub shower': 'Bath with a tub and shower',
+      'bath walk in shower': 'Bath with a walk-in shower',
+      'garage ping pong EV charger': 'Garage with ping-pong and an EV charger'
+    };
+    if (nicer[s]) return nicer[s];
     return s.charAt(0).toUpperCase() + s.slice(1);
   }
   var group = 'exterior', lbIndex = 0, lastFocus = null;
@@ -520,7 +529,7 @@
 
   /* ================= amenities ================= */
   var check = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 5 5 9-10"/></svg>';
-  $('amenities').innerHTML = ['Private hot tub', 'Seasonal pool next door', 'BBQ grill', 'EV / Tesla charger', 'Ping-pong table', 'Air conditioning', 'Near Woodlands Golf', 'Bike paths nearby']
+  $('amenities').innerHTML = ['Private hot tub', 'Seasonal pool next door', 'BBQ grill', 'EV / Tesla charger', 'Ping-pong table', 'Air conditioning', 'Near Woodlands Golf Course', 'Bike paths nearby']
     .map(function (a) { return '<li>' + check + a + '</li>'; }).join('');
 
   /* ================= init ================= */

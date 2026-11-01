@@ -46,7 +46,7 @@
     }
     function fail(msg) {
       box.innerHTML = warn + '<h1>We couldn\'t confirm that yet</h1><p class="sub">' + EW.esc(msg) + '</p>' +
-        '<p>If you were charged, don\'t worry. Your payment is safe and Dan will sort it out. Text him at ' + sms + '.</p>' +
+        '<p>If you were charged, don\'t worry. Your payment is safe, and Dan will take care of it. Text him at ' + sms + '.</p>' +
         '<button class="btn btn-pine" type="button" onclick="location.reload()">Try again</button> <a class="btn btn-outline" href="./">Back to Eaglewood</a>';
     }
     var sid = EW.qs('booked');
@@ -54,7 +54,7 @@
       var ci = EW.addDays(EW.today(), 30);
       return success({ firstName: 'Sample', email: 'sample@example.com', checkin: ci, checkout: EW.addDays(ci, 3), nights: 3, total: CFG.CLEANING_FEE + 3 * CFG.UTILITIES_PER_NIGHT, id: 'DEMO' }, true);
     }
-    if (!sid || !/^cs_(test|live)_[A-Za-z0-9]+$/.test(sid)) return fail('This link is missing its booking reference.');
+    if (!sid || !/^cs_(test|live)_[A-Za-z0-9]+$/.test(sid)) return fail('This link is missing a booking reference.');
     var tries = 0;
     (function attempt() {
       EW.api('confirm', { session_id: sid }).then(function (j) { success(j.booking); })
